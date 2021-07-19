@@ -29,3 +29,21 @@ az account show --output table
 # If using Git Bash avoid C:/Program Files/Git/ being appended to some resources IDs
 export MSYS_NO_PATHCONV=1
 ```
+
+---
+
+### Setup reusable variables
+
+```bash
+# ---
+# Main Vars
+# ---
+app="encrypt";                                echo $app
+env="prod";                                   echo $env
+l="eastus2";                                  echo $l
+user_n_test="artiomlk";                       echo $user_n_test
+user_pass_test="Password123!";                echo $user_pass_test
+
+tags="env=$env app=$app";                     echo $tags
+app_rg="rg-$app-$env";                        echo $app_rg
+```
