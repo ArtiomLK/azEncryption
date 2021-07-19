@@ -55,6 +55,11 @@ vnet_pre2="16";                               echo $vnet_pre2
 vnet_pre="$vnet_pre1.$vnet_pre2";             echo $vnet_pre
 vnet_n="vnet-$app-$env";                      echo $vnet_n
 vnet_addr="$vnet_pre.0.0/16";                 echo $vnet_addr
+
+# ---
+# Key Vault
+# ---
+kv_n="kv-$app-$env";                          echo $kv_n
 ```
 
 ---
@@ -81,4 +86,17 @@ az network vnet create \
 --address-prefixes $vnet_addr \
 --location $l \
 --tags $tags
+```
+
+---
+
+### Create Key Vault with Azure Disk Encryption enabled
+
+```bash
+# Create AzDiskEncryption KeyVault
+az keyvault create \
+--name $kv_n \
+--resource-group $app_rg \
+--location $l \
+--enabled-for-disk-encryption
 ```
