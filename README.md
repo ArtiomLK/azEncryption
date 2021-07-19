@@ -46,6 +46,15 @@ user_pass_test="Password123!";                echo $user_pass_test
 
 tags="env=$env app=$app";                     echo $tags
 app_rg="rg-$app-$env";                        echo $app_rg
+
+# ---
+# NETWORK TOPOLOGY
+# ---
+vnet_pre1="173";                              echo $vnet_pre1
+vnet_pre2="16";                               echo $vnet_pre2
+vnet_pre="$vnet_pre1.$vnet_pre2";             echo $vnet_pre
+vnet_n="vnet-$app-$env";                      echo $vnet_n
+vnet_addr="$vnet_pre.0.0/16";                 echo $vnet_addr
 ```
 
 ---
@@ -56,6 +65,20 @@ app_rg="rg-$app-$env";                        echo $app_rg
 # Create a resource group where our app resources will be created, e.g. AKS, ACR, vNets...
 az group create \
 --name $app_rg \
+--location $l \
+--tags $tags
+```
+
+---
+
+### Create Main vNet
+
+```bash
+# Main vNet
+az network vnet create \
+--name $vnet_n \
+--resource-group $app_rg \
+--address-prefixes $vnet_addr \
 --location $l \
 --tags $tags
 ```
