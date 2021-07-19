@@ -47,3 +47,15 @@ user_pass_test="Password123!";                echo $user_pass_test
 tags="env=$env app=$app";                     echo $tags
 app_rg="rg-$app-$env";                        echo $app_rg
 ```
+
+---
+
+### Create Main Resource Group
+
+```bash
+# Create a resource group where our app resources will be created, e.g. AKS, ACR, vNets...
+az group create \
+--name $app_rg \
+--location $l \
+--tags $tags
+```
