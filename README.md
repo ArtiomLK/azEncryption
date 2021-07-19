@@ -50,7 +50,7 @@ app_rg="rg-$app-$env";                        echo $app_rg
 # ---
 # NETWORK TOPOLOGY
 # ---
-vnet_pre1="172";                              echo $vnet_pre1
+vnet_pre1="173";                              echo $vnet_pre1
 vnet_pre2="16";                               echo $vnet_pre2
 vnet_pre="$vnet_pre1.$vnet_pre2";             echo $vnet_pre
 vnet_n="vnet-$app-$env";                      echo $vnet_n
