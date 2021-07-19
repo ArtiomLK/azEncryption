@@ -38,12 +38,12 @@ export MSYS_NO_PATHCONV=1
 # ---
 # Main Vars
 # ---
-app="encrypt";                          echo $app
-env="prod";                                  echo $env
-l="eastus2";                                 echo $l
-user_n_test="artiomlk";                      echo $user_n_test
-user_pass_test="Password123!";               echo $user_pass_test
+app="encrypt";                                echo $app
+env="prod";                                   echo $env
+l="eastus2";                                  echo $l
+user_n_test="artiomlk";                       echo $user_n_test
+user_pass_test="Password123!";                echo $user_pass_test
 
-tags="env=$env app=$app";                    echo $tags
-app_rg="rg-$app-$env";                       echo $app_rg
+tags="env=$env app=$app";                     echo $tags
+app_rg="rg-$app-$env";                        echo $app_rg
 ```
