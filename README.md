@@ -308,3 +308,30 @@ az keyvault purge --name $kv_n --location $l
 az group delete -n $kv_rg -y --no-wait
 az group delete -n $app_rg -y --no-wait
 ```
+
+## Additional Resources
+
+- [MS | Docs | Azure Disk Encryption for virtual machines and virtual machine scale sets][1]
+- [MS | Docs | Azure Disk Encryption for Virtual Machine Scale Sets Limitations][9]
+- [MS | Docs | Enhancements to recommendation to enable Azure Disk Encryption (ADE)][5]
+- [MS | Docs | Overview of managed disk encryption options][4]
+- Window
+- VM
+- [MS | Docs | Azure Disk Encryption for Windows VMs][6]
+- [MS | Docs | Quickstart: Create and encrypt a Windows VM with the Azure CLI][7]
+- Linux
+- VM
+- [MS | Docs | Azure Disk Encryption for Linux VMs][3]
+- [MS | Docs | Quickstart: Create and encrypt a Linux VM with the Azure CLI][7]
+- VMSS
+- [MS | Docs | Encrypt DATA disks in a Linux virtual machine scale set with the Azure CLI][2]
+
+[1]: https://docs.microsoft.com/en-us/azure/security/fundamentals/azure-disk-encryption-vms-vmss
+[2]: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/disk-encryption-cli
+[3]: https://docs.microsoft.com/en-us/azure/virtual-machines/linux/disk-encryption-overview
+[4]: https://docs.microsoft.com/en-us/azure/virtual-machines/disk-encryption-overview
+[5]: https://docs.microsoft.com/en-us/azure/security-center/upcoming-changes#enhancements-to-recommendation-to-enable-azure-disk-encryption-ade
+[6]: https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disk-encryption-overview
+[7]: https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disk-encryption-cli-quickstart
+[8]: https://docs.microsoft.com/en-us/azure/virtual-machines/linux/disk-encryption-cli-quickstart
+[9]: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/disk-encryption-overview
