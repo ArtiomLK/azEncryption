@@ -197,7 +197,7 @@ az vm encryption enable \
 --disk-encryption-keyvault $KV_ID \
 --volume-type ALL
 
-# Check Windows Encryption
+# Check Windows VM Encryption
 az vm encryption show \
 --name $vm_windows_n \
 --resource-group $app_rg
@@ -275,7 +275,7 @@ az vm encryption enable \
 --disk-encryption-keyvault $KV_ID \
 --volume-type ALL
 
-# Check Encryption
+# Check Linux VM Encryption
 az vm encryption show \
 --name $vm_linux_n \
 --resource-group $app_rg
