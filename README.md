@@ -38,28 +38,43 @@ export MSYS_NO_PATHCONV=1
 # ---
 # Main Vars
 # ---
-app="encrypt";                                echo $app
-env="prod";                                   echo $env
-l="eastus2";                                  echo $l
-user_n_test="artiomlk";                       echo $user_n_test
-user_pass_test="Password123!";                echo $user_pass_test
+app="encrypt";                                              echo $app
+env="prod";                                                 echo $env
+l="eastus2";                                                echo $l
+user_n_test="artiomlk";                                     echo $user_n_test
+user_pass_test="Password123!";                              echo $user_pass_test
 
-tags="env=$env app=$app";                     echo $tags
-app_rg="rg-$app-$env";                        echo $app_rg
+tags="env=$env app=$app";                                   echo $tags
+app_rg="rg-$app-$env";                                      echo $app_rg
 
 # ---
 # NETWORK TOPOLOGY
 # ---
-vnet_pre1="173";                              echo $vnet_pre1
-vnet_pre2="16";                               echo $vnet_pre2
-vnet_pre="$vnet_pre1.$vnet_pre2";             echo $vnet_pre
-vnet_n="vnet-$app-$env";                      echo $vnet_n
-vnet_addr="$vnet_pre.0.0/16";                 echo $vnet_addr
+vnet_pre1="173";                                            echo $vnet_pre1
+vnet_pre2="16";                                             echo $vnet_pre2
+vnet_pre="$vnet_pre1.$vnet_pre2";                           echo $vnet_pre
+vnet_n="vnet-$app-$env";                                    echo $vnet_n
+vnet_addr="$vnet_pre.0.0/16";                               echo $vnet_addr
 
 # ---
 # Key Vault
 # ---
-kv_n="kv-$app-$env";                          echo $kv_n
+kv_n="kv-$app-$env";                                        echo $kv_n
+
+# ---
+# VMs
+# ---
+#Topology
+snet_vm_n="snet-$app-vms-$env";                             echo $snet_vm_n
+snet_vm_addr="$vnet_pre.2.0/24";                            echo $snet_vm_addr
+nsg_vm_n="nsg-$app-vms-$env";                               echo $nsg_vm_n
+#Linux VMs
+vm_linux_n="vm-$app-linux-$env";                            echo $vm_linux_n
+vm_linux_img="Canonical:UbuntuServer:16.04-LTS:latest";     echo $vm_linux_img
+vm_linux_size="Standard_D2S_V3";                            echo $vm_linux_size
+#Windows VMs
+vm_windows_n="vm-$app-$env";                                echo $vm_windows_n
+vm_windows_img="win2016datacenter";                         echo $vm_windows_img
 ```
 
 ---
@@ -99,4 +114,102 @@ az keyvault create \
 --resource-group $app_rg \
 --location $l \
 --enabled-for-disk-encryption
+```
+
+---
+
+### Encrypt Existing Linux & Windows VMs
+
+```bash
+# ---
+# sNet Topology
+# ---
+
+# VMs NSG with Default rules
+az network nsg create \
+--resource-group $app_rg \
+--name $nsg_vm_n \
+--location $l \
+--tags $tags
+
+# VMs Subnet
+az network vnet subnet create \
+--resource-group $app_rg \
+--vnet-name $vnet_n \
+--name $snet_vm_n \
+--address-prefixes $snet_vm_addr \
+--network-security-group $nsg_vm_n
+
+# ---
+# Linux
+# ---
+
+# Create a Linux VM without Encryption
+az vm create \
+--resource-group $app_rg \
+--name $vm_linux_n \
+--vnet-name $vnet_n \
+--subnet $snet_vm_n \
+--image $vm_linux_img \
+--size $vm_linux_size \
+--admin-username $user_n_test \
+--generate-ssh-keys \
+--public-ip-address "" \
+--nsg "" \
+--nsg-rule NONE \
+--tags $tags
+
+# Encrypt Linux VM
+az vm encryption enable \
+--name $vm_linux_n \
+--resource-group $app_rg \
+--disk-encryption-keyvault $kv_n \
+--volume-type ALL
+
+# Check Encryption
+az vm encryption show \
+--name $vm_linux_n \
+--resource-group $app_rg
+
+# ---
+# Windows
+# ---
+
+# Create a Windows VM without Encryption
+az vm create \
+--resource-group $app_rg \
+--name $vm_windows_n \
+--vnet-name $vnet_n \
+--subnet $snet_vm_n \
+--image $vm_windows_img \
+--admin-username $user_n_test \
+--admin-password $user_pass_test \
+--public-ip-address "" \
+--nsg "" \
+--nsg-rule NONE \
+--tags $tags
+
+# Encrypt Windows VM
+az vm encryption enable \
+--name $vm_windows_n \
+--resource-group $app_rg \
+--disk-encryption-keyvault $kv_n \
+--volume-type ALL
+
+# Check Windows Encryption
+az vm encryption show \
+--name $vm_windows_n \
+--resource-group $app_rg
+```
+
+---
+
+---
+
+### Clean up resources
+
+```bash
+az keyvault delete --name $kv_n --resource-group $app_rg
+az keyvault purge --name $kv_n --location $l --no-wait
+az group delete -n $app_rg -y --no-wait
 ```
