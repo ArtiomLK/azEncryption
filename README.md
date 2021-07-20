@@ -214,6 +214,8 @@ az vm encryption show \
 --resource-group $app_rg
 ```
 
+---
+
 ### Encrypt Existing Linux & Windows VM Scale Sets
 
 ```bash
