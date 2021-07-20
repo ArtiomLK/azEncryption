@@ -232,7 +232,7 @@ az vmss create \
 --vnet-name $vnet_n \
 --subnet $snet_vm_n \
 --instance-count 3 \
---upgrade-policy-mode Rolling \
+--upgrade-policy-mode Automatic \
 --single-placement-group false \
 --platform-fault-domain-count 1 \
 --admin-username $user_n_test \
@@ -266,7 +266,7 @@ az vmss create \
 --vnet-name $vnet_n \
 --subnet $snet_vm_n \
 --instance-count 3 \
---upgrade-policy-mode Rolling \
+--upgrade-policy-mode Automatic \
 --single-placement-group false \
 --platform-fault-domain-count 1 \
 --admin-username $user_n_test \
