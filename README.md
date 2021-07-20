@@ -71,11 +71,12 @@ snet_vm_addr="$vnet_pre.2.0/24";                            echo $snet_vm_addr
 nsg_vm_n="nsg-$app-vms-$env";                               echo $nsg_vm_n
 #Linux VMs
 vm_linux_n="vm-$app-linux-$env";                            echo $vm_linux_n
-vm_linux_img="Canonical:UbuntuServer:16.04-LTS:latest";     echo $vm_linux_img
+vm_linux_img="UbuntuLTS ";                                  echo $vm_linux_img
 vm_linux_size="Standard_D2S_V3";                            echo $vm_linux_size
 #Windows VMs
 vm_windows_n="vm-$app-$env";                                echo $vm_windows_n
 vm_windows_img="win2016datacenter";                         echo $vm_windows_img
+vm_windows_size="Standard_D2S_V3";                          echo $vm_windows_size
 ```
 
 ---
@@ -191,6 +192,7 @@ az vm create \
 --vnet-name $vnet_n \
 --subnet $snet_vm_n \
 --image $vm_windows_img \
+--size $vm_windows_size \
 --admin-username $user_n_test \
 --admin-password $user_pass_test \
 --public-ip-address "" \
@@ -214,13 +216,95 @@ az vm encryption show \
 
 ---
 
+### Encrypt Existing Linux & Windows VM Scale Sets
+
+```bash
+# ---
+# Windows VMSS
+# ---
+# Windows VM Scale Sets
+az vmss create \
+--name $vm_windows_n \
+--resource-group $app_rg \
+--image $vm_windows_img \
+--vm-sku $vm_windows_size \
+--storage-sku StandardSSD_LRS \
+--vnet-name $vnet_n \
+--subnet $snet_vm_n \
+--instance-count 3 \
+--upgrade-policy-mode Automatic \
+--single-placement-group false \
+--platform-fault-domain-count 1 \
+--admin-username $user_n_test \
+--admin-password $user_pass_test \
+--public-ip-address "" \
+--nsg "" \
+--tags $tags
+
+# Encrypt Windows VMSS
+KV_ID=$(az keyvault show --resource-group $kv_rg --name $kv_n  --query id --out tsv); echo $KV_ID
+az vmss encryption enable \
+-g $app_rg  \
+-n $vm_windows_n \
+--disk-encryption-keyvault $KV_ID \
+--volume-type ALL
+
+# Check Windows VMSS Encryption
+az vmss encryption show \
+--name $vm_windows_n \
+--resource-group $app_rg
+
+# ---
+# Linux VMSS
+# ---
+# Linux VM Scale Sets
+az vmss create \
+--resource-group $app_rg  \
+--name $vm_linux_n \
+--image $vm_linux_img \
+--vnet-name $vnet_n \
+--subnet $snet_vm_n \
+--instance-count 3 \
+--upgrade-policy-mode automatic \
+--admin-username $user_n_test \
+--generate-ssh-keys \
+--public-ip-address "" \
+--nsg "" \
+--data-disk-sizes-gb 32 \
+--tags $tags
+
+# Prepare the data disk for use with the Custom Script Extension
+az vmss extension set \
+--publisher Microsoft.Azure.Extensions \
+--version 2.0 \
+--name CustomScript \
+--resource-group $app_rg \
+--vmss-name $vm_linux_n \
+--settings '{"fileUris":["https://raw.githubusercontent.com/Azure-Samples/compute-automation-configurations/master/prepare_vm_disks.sh"],"commandToExecute":"./prepare_vm_disks.sh"}'
+
+# Encrypt Linux VMSS
+KV_ID=$(az keyvault show --resource-group $kv_rg --name $kv_n  --query id --out tsv); echo $KV_ID
+az vmss encryption enable \
+-g $app_rg  \
+-n $vm_linux_n \
+--disk-encryption-keyvault $KV_ID \
+--volume-type DATA
+
+# Check Linux VMSS Encryption
+az vmss encryption show \
+--name $vm_linux_n \
+--resource-group $app_rg
+```
+
+---
+
 ---
 
 ### Clean up resources
 
 ```bash
-az group delete -n $app_rg -y --no-wait
 az keyvault delete --name $kv_n --resource-group $app_rg
-az keyvault purge --name $kv_n --location $l --no-wait
+az keyvault purge --name $kv_n --location $l
 az group delete -n $kv_rg -y --no-wait
+az group delete -n $app_rg -y --no-wait
 ```
