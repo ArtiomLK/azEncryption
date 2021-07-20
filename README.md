@@ -274,15 +274,15 @@ az vmss create \
 --public-ip-address "" \
 --tags $tags
 
-# Encrypt Windows VMSS
+# Encrypt Linux VMSS
 KV_ID=$(az keyvault show --resource-group $kv_rg --name $kv_n  --query id --out tsv); echo $KV_ID
 az vmss encryption enable \
 -g $app_rg  \
 -n $vm_linux_n \
 --disk-encryption-keyvault $KV_ID \
---volume-type ALL
+--volume-type DATA
 
-# Check Windows VMSS Encryption
+# Check Linux VMSS Encryption
 az vmss encryption show \
 --name $vm_linux_n \
 --resource-group $app_rg
