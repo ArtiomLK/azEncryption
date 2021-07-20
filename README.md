@@ -39,7 +39,7 @@ export MSYS_NO_PATHCONV=1
 # Main Vars
 # ---
 app="encrypt";                                              echo $app
-env="dev";                                                 echo $env
+env="prod";                                                 echo $env
 l="eastus2";                                                echo $l
 user_n_test="artiomlk";                                     echo $user_n_test
 user_pass_test="Password123!";                              echo $user_pass_test
@@ -121,6 +121,10 @@ az keyvault create \
 ### Encrypt Existing Linux & Windows VMs
 
 ```bash
+# ---
+# sNet Topology
+# ---
+
 # VMs NSG with Default rules
 az network nsg create \
 --resource-group $app_rg \
