@@ -76,6 +76,7 @@ vm_linux_size="Standard_D2S_V3";                            echo $vm_linux_size
 #Windows VMs
 vm_windows_n="vm-$app-$env";                                echo $vm_windows_n
 vm_windows_img="win2016datacenter";                         echo $vm_windows_img
+vm_windows_size="Standard_D2S_V3";                          echo $vm_windows_size
 ```
 
 ---
@@ -191,6 +192,7 @@ az vm create \
 --vnet-name $vnet_n \
 --subnet $snet_vm_n \
 --image $vm_windows_img \
+--size $vm_windows_size \
 --admin-username $user_n_test \
 --admin-password $user_pass_test \
 --public-ip-address "" \
@@ -209,6 +211,78 @@ az vm encryption enable \
 # Check Windows Encryption
 az vm encryption show \
 --name $vm_windows_n \
+--resource-group $app_rg
+```
+
+### Encrypt Existing Linux & Windows VM Scale Sets
+
+```bash
+# ---
+# Windows VMSS
+# ---
+# Windows VM Scale Sets
+az vmss create \
+--name $vm_windows_n \
+--resource-group $app_rg \
+--image $vm_windows_img \
+--vm-sku $vm_windows_size \
+--storage-sku StandardSSD_LRS \
+--vnet-name $vnet_n \
+--subnet $snet_vm_n \
+--instance-count 3 \
+--upgrade-policy-mode Rolling \
+--single-placement-group false \
+--platform-fault-domain-count 1 \
+--admin-username $user_n_test \
+--admin-password $user_pass_test \
+--public-ip-address "" \
+--tags $tags
+
+# Encrypt Windows VMSS
+KV_ID=$(az keyvault show --resource-group $kv_rg --name $kv_n  --query id --out tsv); echo $KV_ID
+az vmss encryption enable \
+-g $app_rg  \
+-n $vm_windows_n \
+--disk-encryption-keyvault $KV_ID \
+--volume-type ALL
+
+# Check Windows VMSS Encryption
+az vmss encryption show \
+--name $vm_windows_n \
+--resource-group $app_rg
+
+# ---
+# Linux VMSS
+# ---
+# Linux VM Scale Sets
+az vmss create \
+--name $vm_linux_n \
+--resource-group $app_rg \
+--image $vm_linux_img \
+--vm-sku $vm_linux_size \
+--storage-sku StandardSSD_LRS \
+--vnet-name $vnet_n \
+--subnet $snet_vm_n \
+--instance-count 3 \
+--upgrade-policy-mode Rolling \
+--single-placement-group false \
+--platform-fault-domain-count 1 \
+--admin-username $user_n_test \
+--generate-ssh-keys \
+--public-ip-address "" \
+--tags $tags
+
+# Encrypt Windows VMSS
+KV_ID=$(az keyvault show --resource-group $kv_rg --name $kv_n  --query id --out tsv); echo $KV_ID
+az vmss encryption enable \
+-g $app_rg  \
+-n $vm_linux_n \
+--disk-encryption-keyvault $KV_ID \
+--volume-type ALL
+
+# Check Windows VMSS Encryption
+az vmss encryption show \
+--name $vm_linux_n \
 --resource-group $app_rg
 ```
 
