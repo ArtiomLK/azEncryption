@@ -59,6 +59,7 @@ vnet_addr="$vnet_pre.0.0/16";                               echo $vnet_addr
 # ---
 # Key Vault
 # ---
+kv_rg="rg-$app-kv-$env";                                    echo $kv_rg
 kv_n="kv-$app-$env";                                        echo $kv_n
 
 # ---
@@ -108,12 +109,19 @@ az network vnet create \
 ### Create Key Vault with Azure Disk Encryption enabled
 
 ```bash
+# Key Vault Resource Group
+az group create \
+--name $kv_rg \
+--location $l \
+--tags $tags
+
 # Create AzDiskEncryption KeyVault
 az keyvault create \
 --name $kv_n \
---resource-group $app_rg \
+--resource-group $kv_rg \
 --location $l \
---enabled-for-disk-encryption
+--enabled-for-disk-encryption \
+--tags $tags
 ```
 
 ---
@@ -160,10 +168,11 @@ az vm create \
 --tags $tags
 
 # Encrypt Linux VM
+KV_ID=$(az keyvault show --resource-group $kv_rg --name $kv_n  --query id --out tsv); echo $KV_ID
 az vm encryption enable \
 --name $vm_linux_n \
 --resource-group $app_rg \
---disk-encryption-keyvault $kv_n \
+--disk-encryption-keyvault $KV_ID \
 --volume-type ALL
 
 # Check Encryption
@@ -190,10 +199,11 @@ az vm create \
 --tags $tags
 
 # Encrypt Windows VM
+KV_ID=$(az keyvault show --resource-group $kv_rg --name $kv_n  --query id --out tsv); echo $KV_ID
 az vm encryption enable \
 --name $vm_windows_n \
 --resource-group $app_rg \
---disk-encryption-keyvault $kv_n \
+--disk-encryption-keyvault $KV_ID \
 --volume-type ALL
 
 # Check Windows Encryption
@@ -209,7 +219,8 @@ az vm encryption show \
 ### Clean up resources
 
 ```bash
+az group delete -n $app_rg -y --no-wait
 az keyvault delete --name $kv_n --resource-group $app_rg
 az keyvault purge --name $kv_n --location $l --no-wait
-az group delete -n $app_rg -y --no-wait
+az group delete -n $kv_rg -y --no-wait
 ```
