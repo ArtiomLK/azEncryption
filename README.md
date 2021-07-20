@@ -344,6 +344,7 @@ az group delete -n $app_rg -y --no-wait
 
 - [MS | Docs | Azure Disk Encryption for virtual machines and virtual machine scale sets][1]
 - [MS | Docs | Azure Disk Encryption for Virtual Machine Scale Sets Limitations][9]
+- [MS | Docs | Create and configure a key vault for Azure Disk Encryption on a Windows VM (Enable Firewall Access to MS Trusted Services)][10]
 - [MS | Docs | Enhancements to recommendation to enable Azure Disk Encryption (ADE)][5]
 - [MS | Docs | Overview of managed disk encryption options][4]
 - Window
@@ -366,6 +367,7 @@ az group delete -n $app_rg -y --no-wait
 [7]: https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disk-encryption-cli-quickstart
 [8]: https://docs.microsoft.com/en-us/azure/virtual-machines/linux/disk-encryption-cli-quickstart
 [9]: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/disk-encryption-overview
+[10]: https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disk-encryption-key-vault
 [100]: #connect-to-our-azure-subscription
 [101]: #setup-reusable-variables
 [102]: #create-main-resource-group
