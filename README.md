@@ -1,5 +1,25 @@
 # azEncryption
 
+## How to
+
+All these CLI commands require us to login into azure `az login` and set the right subscription `az account set --subscription SUB_ID`. We could use the CLI commands individually as required or in order. For instance:
+
+- [Follow CLI instructions in order][100]
+
+## Quick Links
+
+- [Connect to our azure subscription][100]
+- [Setup reusable variables][101]
+- [Create Main Resource Group][102]
+- [Create Network Topology][103]
+- [Create Key Vault with Azure Disk Encryption enabled][104]
+- [Encrypt Existing Windows VMs][105]
+- [Encrypt Existing Windows VM Scale Sets][106]
+- [Encrypt Existing Linux VMs][107]
+- [Encrypt Existing Linux VM Scale Sets][108]
+- [Clean up resources][109]
+- [Additional Resources][110]
+
 ## Useful Commands
 
 | Command                                                              | Description                                     |
@@ -93,16 +113,36 @@ az group create \
 
 ---
 
-### Create Main vNet
+### Create Network Topology
 
 ```bash
+# ---
 # Main vNet
+# ---
 az network vnet create \
 --name $vnet_n \
 --resource-group $app_rg \
 --address-prefixes $vnet_addr \
 --location $l \
 --tags $tags
+
+# ---
+# VMs sNet
+# ---
+# Create NSG with Default rules
+az network nsg create \
+--resource-group $app_rg \
+--name $nsg_vm_n \
+--location $l \
+--tags $tags
+
+# Create Subnet
+az network vnet subnet create \
+--resource-group $app_rg \
+--vnet-name $vnet_n \
+--name $snet_vm_n \
+--address-prefixes $snet_vm_addr \
+--network-security-group $nsg_vm_n
 ```
 
 ---
@@ -127,62 +167,11 @@ az keyvault create \
 
 ---
 
-### Encrypt Existing Linux & Windows VMs
+### Encrypt Existing Windows VMs
 
 ```bash
 # ---
-# sNet Topology
-# ---
-
-# VMs NSG with Default rules
-az network nsg create \
---resource-group $app_rg \
---name $nsg_vm_n \
---location $l \
---tags $tags
-
-# VMs Subnet
-az network vnet subnet create \
---resource-group $app_rg \
---vnet-name $vnet_n \
---name $snet_vm_n \
---address-prefixes $snet_vm_addr \
---network-security-group $nsg_vm_n
-
-# ---
-# Linux
-# ---
-
-# Create a Linux VM without Encryption
-az vm create \
---resource-group $app_rg \
---name $vm_linux_n \
---vnet-name $vnet_n \
---subnet $snet_vm_n \
---image $vm_linux_img \
---size $vm_linux_size \
---admin-username $user_n_test \
---generate-ssh-keys \
---public-ip-address "" \
---nsg "" \
---nsg-rule NONE \
---tags $tags
-
-# Encrypt Linux VM
-KV_ID=$(az keyvault show --resource-group $kv_rg --name $kv_n  --query id --out tsv); echo $KV_ID
-az vm encryption enable \
---name $vm_linux_n \
---resource-group $app_rg \
---disk-encryption-keyvault $KV_ID \
---volume-type ALL
-
-# Check Encryption
-az vm encryption show \
---name $vm_linux_n \
---resource-group $app_rg
-
-# ---
-# Windows
+# Windows VM
 # ---
 
 # Create a Windows VM without Encryption
@@ -216,7 +205,7 @@ az vm encryption show \
 
 ---
 
-### Encrypt Existing Linux & Windows VM Scale Sets
+### Encrypt Existing Windows VM Scale Sets
 
 ```bash
 # ---
@@ -253,7 +242,50 @@ az vmss encryption enable \
 az vmss encryption show \
 --name $vm_windows_n \
 --resource-group $app_rg
+```
 
+---
+
+### Encrypt Existing Linux VMs
+
+```bash
+# ---
+# Linux VM
+# ---
+# Create a Linux VM without Encryption
+az vm create \
+--resource-group $app_rg \
+--name $vm_linux_n \
+--vnet-name $vnet_n \
+--subnet $snet_vm_n \
+--image $vm_linux_img \
+--size $vm_linux_size \
+--admin-username $user_n_test \
+--generate-ssh-keys \
+--public-ip-address "" \
+--nsg "" \
+--nsg-rule NONE \
+--tags $tags
+
+# Encrypt Linux VM
+KV_ID=$(az keyvault show --resource-group $kv_rg --name $kv_n  --query id --out tsv); echo $KV_ID
+az vm encryption enable \
+--name $vm_linux_n \
+--resource-group $app_rg \
+--disk-encryption-keyvault $KV_ID \
+--volume-type ALL
+
+# Check Encryption
+az vm encryption show \
+--name $vm_linux_n \
+--resource-group $app_rg
+```
+
+---
+
+### Encrypt Existing Linux VM Scale Sets
+
+```bash
 # ---
 # Linux VMSS
 # ---
@@ -298,16 +330,15 @@ az vmss encryption show \
 
 ---
 
----
-
 ### Clean up resources
 
 ```bash
-az keyvault delete --name $kv_n --resource-group $app_rg
-az keyvault purge --name $kv_n --location $l
-az group delete -n $kv_rg -y --no-wait
+az group delete -n $kv_rg -y
+az keyvault purge --name $kv_n --location $l --no-wait
 az group delete -n $app_rg -y --no-wait
 ```
+
+---
 
 ## Additional Resources
 
@@ -335,3 +366,14 @@ az group delete -n $app_rg -y --no-wait
 [7]: https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disk-encryption-cli-quickstart
 [8]: https://docs.microsoft.com/en-us/azure/virtual-machines/linux/disk-encryption-cli-quickstart
 [9]: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/disk-encryption-overview
+[100]: #connect-to-our-azure-subscription
+[101]: #setup-reusable-variables
+[102]: #create-main-resource-group
+[103]: #create-network-topology
+[104]: #create-key-vault-with-azure-disk-encryption-enabled
+[105]: #encrypt-existing-windows-vms
+[106]: #encrypt-existing-windows-vm-scale-sets
+[107]: #encrypt-existing-linux-vms
+[108]: #encrypt-existing-linux-vm-scale-sets
+[109]: #clean-up-resources
+[110]: #additional-resources
