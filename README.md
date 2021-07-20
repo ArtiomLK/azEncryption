@@ -39,7 +39,7 @@ export MSYS_NO_PATHCONV=1
 # Main Vars
 # ---
 app="encrypt";                                              echo $app
-env="dev";                                                 echo $env
+env="prod";                                                 echo $env
 l="eastus2";                                                echo $l
 user_n_test="artiomlk";                                     echo $user_n_test
 user_pass_test="Password123!";                              echo $user_pass_test
@@ -219,7 +219,8 @@ az vm encryption show \
 ### Clean up resources
 
 ```bash
+az group delete -n $app_rg -y --no-wait
 az keyvault delete --name $kv_n --resource-group $app_rg
 az keyvault purge --name $kv_n --location $l --no-wait
-az group delete -n $app_rg -y --no-wait
+az group delete -n $kv_rg -y --no-wait
 ```
